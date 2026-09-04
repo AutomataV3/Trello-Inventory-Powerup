@@ -14,4 +14,17 @@ window.TrelloPowerUp.initialize({
         }
       }
     ];
+  },
+
+  'card-back-section': function (t, options){
+
+    return{
+      title: 'Inventario',
+      icon: './assets/icon.png',
+      content: {
+        type: 'iframe',
+        url: './inventory.html',
+        height: 400
+      }
+    };
   }
