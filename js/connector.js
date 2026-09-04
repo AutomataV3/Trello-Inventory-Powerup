@@ -20,7 +20,6 @@ window.TrelloPowerUp.initialize({
 
     return{
       title: 'Inventario',
-      icon: './assets/icon.png',
       content: {
         type: 'iframe',
         url: './inventory.html',
