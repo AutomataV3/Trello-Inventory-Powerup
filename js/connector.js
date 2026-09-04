@@ -4,6 +4,7 @@ window.TrelloPowerUp.initialize({
     return [
       {
         text: 'Inventario',
+        condition: 'always',
         callback: function (t){
 
           return t.popup({
@@ -18,8 +19,9 @@ window.TrelloPowerUp.initialize({
 
   'card-back-section': function (t, options){
 
-    return{
+    return {
       title: 'Inventario',
+      icon: 'https://automatav3.github.io/Trello-Inventory-Powerup/assets/icon-gray.svg',
       content: {
         type: 'iframe',
         url: './inventory.html',
