@@ -9,10 +9,28 @@
   </head>
   
   <body>
-    <h2>Inventario</h2>  
-
-    <p>
-      El módulo de inventario está funcionando
-    </p>
+    <div class="inventario-container">
+      <h2>Inventario</h2>  
+      <table>
+        <thread>
+          <tr>
+            <th>Piezas</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Acción</th>
+          </tr>
+        </thread>
+        <tbody id='tableInvetario'>
+          <tr>
+            <td colspan="4" class="sin-productos">
+              No hay productos en el inventario
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-agregar" id="btnAgregar">
+        + Agregar producto
+      </button>
+    </div>
   </body>
 </html>
