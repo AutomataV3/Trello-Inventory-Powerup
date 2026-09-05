@@ -499,17 +499,6 @@
             btnAgregar.style.display =
                 'inline-block';
 
-
-            // ==================================
-            // NOTIFICACIÓN TEMPORAL
-            // ==================================
-
-            await t.notify({
-                message: 'Producto agregado al inventario.',
-                type: 'success'
-            });
-
-
         } catch (error) {
 
             console.error(
@@ -616,7 +605,9 @@
             // Esperamos a que Trello termine
             // de inicializar el iframe.
 
-            await t.render();
+            t.render(function () {
+                console.log('Trello terminó de renderizar el iframe.');
+            });
 
 
             // Comprobamos que existe una tarjeta
