@@ -143,6 +143,61 @@
             background-color: #bf2600;
         }
 
+        /* ==========================================
+   FORMULARIO DE DESCUENTO
+   ========================================== */
+
+        .fila-descuento td {
+            background-color: #f4f5f7;
+            padding: 10px;
+        }
+
+        .formulario-descuento {
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .formulario-descuento label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .cantidad-descuento {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            border: 1px solid #dfe1e6;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .botones-descuento {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-confirmar-descuento,
+        .btn-cancelar-descuento {
+            border: none;
+            padding: 7px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-confirmar-descuento {
+            background-color: #de350b;
+            color: white;
+        }
+
+        .btn-cancelar-descuento {
+            background-color: #dfe1e6;
+            color: #172b4d;
+        }
+
     </style>
 
 </head>
@@ -520,10 +575,14 @@
     // MOSTRAR INVENTARIO
     // ==========================================
 
-    function mostrarInventario(productos) {
+  function mostrarInventario(productos) {
 
     tablaInventario.innerHTML = '';
 
+
+    // ==========================================
+    // SIN PRODUCTOS
+    // ==========================================
 
     if (
         !productos ||
@@ -551,6 +610,10 @@
 
     }
 
+
+    // ==========================================
+    // CREAR FILAS
+    // ==========================================
 
     productos.forEach(function (producto, indice) {
 
@@ -597,140 +660,270 @@
 
         btnDescontar.addEventListener(
             'click',
-            async function () {
+            function () {
 
-                // ------------------------------
-                // SOLICITAR CANTIDAD
-                // ------------------------------
+                // Evitar crear varios formularios
+                // para el mismo producto.
 
-                const cantidadTexto =
-                    prompt(
-                        `¿Cuántas piezas deseas descontar?\n\n` +
-                        `Producto: ${producto.descripcion}\n` +
-                        `Stock disponible: ${producto.piezas}`
-                    );
+                const formularioExistente =
+                    fila.nextElementSibling;
 
-
-                // Si el usuario cancela
-
-                if (cantidadTexto === null) {
-
-                    return;
-
-                }
-
-
-                // ------------------------------
-                // CONVERTIR A NÚMERO
-                // ------------------------------
-
-                const cantidad =
-                    Number(cantidadTexto);
-
-
-                // ------------------------------
-                // VALIDAR CANTIDAD
-                // ------------------------------
 
                 if (
-                    cantidadTexto.trim() === '' ||
-                    !Number.isInteger(cantidad) ||
-                    cantidad <= 0
+                    formularioExistente &&
+                    formularioExistente.classList.contains(
+                        'fila-descuento'
+                    )
                 ) {
 
-                    alert(
-                        'Ingresa una cantidad válida de piezas.'
-                    );
+                    formularioExistente.remove();
 
                     return;
 
                 }
 
 
-                // ------------------------------
-                // VALIDAR STOCK
-                // ------------------------------
+                // ==================================
+                // CREAR FILA DEL FORMULARIO
+                // ==================================
 
-                if (
-                    cantidad > producto.piezas
-                ) {
+                const filaDescuento =
+                    document.createElement('tr');
 
-                    alert(
-                        `No puedes descontar ${cantidad} piezas.\n\n` +
-                        `Stock disponible: ${producto.piezas} piezas.`
+
+                filaDescuento.className =
+                    'fila-descuento';
+
+
+                filaDescuento.innerHTML = `
+
+                    <td colspan="4">
+
+                        <div class="formulario-descuento">
+
+                            <label>
+                                Piezas a descontar
+                            </label>
+
+                            <input
+                                type="number"
+                                class="cantidad-descuento"
+                                min="1"
+                                max="${producto.piezas}"
+                                placeholder="Ej. 5">
+
+                            <div class="botones-descuento">
+
+                                <button
+                                    type="button"
+                                    class="btn-confirmar-descuento">
+
+                                    Descontar
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn-cancelar-descuento">
+
+                                    Cancelar
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                `;
+
+
+                // Insertar inmediatamente
+                // debajo del producto.
+
+                fila.after(filaDescuento);
+
+
+                const cantidadInput =
+                    filaDescuento.querySelector(
+                        '.cantidad-descuento'
                     );
 
-                    return;
 
-                }
-
-
-                try {
-
-                    // --------------------------
-                    // OBTENER INVENTARIO ACTUAL
-                    // --------------------------
-
-                    let inventarioActual =
-                        await t.get(
-                            'card',
-                            'shared',
-                            'inventario',
-                            []
-                        );
+                const btnConfirmar =
+                    filaDescuento.querySelector(
+                        '.btn-confirmar-descuento'
+                    );
 
 
-                    if (
-                        !Array.isArray(inventarioActual)
-                    ) {
+                const btnCancelarDescuento =
+                    filaDescuento.querySelector(
+                        '.btn-cancelar-descuento'
+                    );
 
-                        inventarioActual = [];
+
+                cantidadInput.focus();
+
+
+                // ==================================
+                // CANCELAR
+                // ==================================
+
+                btnCancelarDescuento.addEventListener(
+                    'click',
+                    function () {
+
+                        filaDescuento.remove();
 
                     }
+                );
 
 
-                    // --------------------------
-                    // DESCONTAR PIEZAS
-                    // --------------------------
+                // ==================================
+                // CONFIRMAR DESCUENTO
+                // ==================================
 
-                    inventarioActual[indice].piezas -=
-                        cantidad;
+                btnConfirmar.addEventListener(
+                    'click',
+                    async function () {
 
-
-                    // --------------------------
-                    // GUARDAR EN TRELLO
-                    // --------------------------
-
-                    await t.set(
-                        'card',
-                        'shared',
-                        'inventario',
-                        inventarioActual
-                    );
+                        const cantidadTexto =
+                            cantidadInput.value;
 
 
-                    // --------------------------
-                    // ACTUALIZAR TABLA
-                    // --------------------------
-
-                    mostrarInventario(
-                        inventarioActual
-                    );
+                        const cantidad =
+                            Number(cantidadTexto);
 
 
-                } catch (error) {
+                        // ------------------------------
+                        // VALIDAR CANTIDAD
+                        // ------------------------------
 
-                    console.error(
-                        'Error al descontar inventario:',
-                        error
-                    );
+                        if (
+                            cantidadTexto.trim() === '' ||
+                            !Number.isInteger(cantidad) ||
+                            cantidad <= 0
+                        ) {
+
+                            alert(
+                                'Ingresa una cantidad válida de piezas.'
+                            );
+
+                            cantidadInput.focus();
+
+                            return;
+
+                        }
 
 
-                    alert(
-                        'No fue posible descontar las piezas del inventario.'
-                    );
+                        // ------------------------------
+                        // VALIDAR STOCK
+                        // ------------------------------
 
-                }
+                        if (
+                            cantidad > producto.piezas
+                        ) {
+
+                            alert(
+                                `No puedes descontar ${cantidad} piezas.\n\n` +
+                                `Stock disponible: ${producto.piezas} piezas.`
+                            );
+
+                            cantidadInput.focus();
+
+                            return;
+
+                        }
+
+
+                        try {
+
+                            // --------------------------
+                            // OBTENER INVENTARIO ACTUAL
+                            // --------------------------
+
+                            let inventarioActual =
+                                await t.get(
+                                    'card',
+                                    'shared',
+                                    'inventario',
+                                    []
+                                );
+
+
+                            if (
+                                !Array.isArray(
+                                    inventarioActual
+                                )
+                            ) {
+
+                                inventarioActual = [];
+
+                            }
+
+
+                            // --------------------------
+                            // DESCONTAR
+                            // --------------------------
+
+                            inventarioActual[indice].piezas -=
+                                cantidad;
+
+
+                            // --------------------------
+                            // ELIMINAR SI LLEGA A 0
+                            // --------------------------
+
+                            if (
+                                inventarioActual[indice].piezas <= 0
+                            ) {
+
+                                inventarioActual.splice(
+                                    indice,
+                                    1
+                                );
+
+                            }
+
+
+                            // --------------------------
+                            // GUARDAR EN TRELLO
+                            // --------------------------
+
+                            await t.set(
+                                'card',
+                                'shared',
+                                'inventario',
+                                inventarioActual
+                            );
+
+
+                            // --------------------------
+                            // ACTUALIZAR TABLA
+                            // --------------------------
+
+                            mostrarInventario(
+                                inventarioActual
+                            );
+
+
+                        } catch (error) {
+
+                            console.error(
+                                'Error al descontar inventario:',
+                                error
+                            );
+
+
+                            alert(
+                                'No fue posible descontar las piezas del inventario.'
+                            );
+
+                        }
+
+                    }
+                );
 
             }
         );
