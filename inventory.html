@@ -8,6 +8,8 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    
     <title>Inventario V1.0.2</title>
 
     <style>
@@ -270,6 +272,8 @@
 
 <script>
 
+    const t = TrelloPowerUp.iframe();
+    
     const btnAgregar =
         document.getElementById('btnAgregar');
 
@@ -320,7 +324,7 @@
 
     // GUARDAR PRODUCTO
 
-    btnGuardar.addEventListener('click', function () {
+    btnGuardar.addEventListener('click', async function () {
 
         const piezas = piezasInput.value.trim();
 
@@ -404,7 +408,7 @@
         // Agregar fila a la tabla
 
         tablaInventario.appendChild(fila);
-
+        await guardarInventario();
 
         // Limpiar formulario
 
@@ -432,6 +436,47 @@
 
         precioInput.value = '';
 
+    }
+
+    async function guardarInventario(){
+
+        const productos = [];
+
+        const filas = tablaInventario.querySelectorAll('tr');
+
+        filas.forEach(function (fila)){
+
+            if(fila.querySelector('.sin-productos')){
+                return;
+            }
+
+            const celdas = fila.querySelectorAll('td');
+
+            if(celdas.length < 3){
+                return;
+            }
+
+            const piezas = Number(celdas[0].textContext);
+
+            const descripcion = celdas[1].textContent;
+
+            const precioTexto = celdas[2].textContent.replace('$','').trim();
+
+            const precio = Number(precioTexto);
+
+            productos.push({
+                piezas: piezas,
+                descripcion: descripcion,
+                precio: precio
+            });
+
+            await t.set(
+                'card',
+                'shared',
+                'inventario',
+                productos
+            );
+        }
     }
 
 </script>
