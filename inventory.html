@@ -263,6 +263,15 @@
 
         </button>
 
+        <button
+            class="btn-agregar"
+            id="btnAutorizar"
+            style="margin-left: 8px;">
+
+            Autorizar notificaciones
+
+        </button>
+
 
         <!-- FORMULARIO -->
 
@@ -354,6 +363,9 @@
     const btnAgregar =
         document.getElementById('btnAgregar');
 
+    const btnAutorizar =
+        document.getElementById('btnAutorizar');
+
     const formularioProducto =
         document.getElementById('formularioProducto');
 
@@ -389,6 +401,43 @@
         piezasInput.focus();
 
     });
+
+    // ==========================================
+// AUTORIZAR API DE TRELLO
+// ==========================================
+
+    btnAutorizar.addEventListener(
+        'click',
+        async function () {
+
+            try {
+
+                const api =
+                    await t.getRestApi();
+
+                await api.authorize({
+                    scope: 'read,write'
+                });
+
+                alert(
+                    'Inventory Manager ha sido autorizado correctamente.'
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Error al autorizar Trello:',
+                    error
+                );
+
+                alert(
+                    'No fue posible autorizar Inventory Manager.'
+                );
+
+            }
+
+        }
+    );
 
 
     // ==========================================
