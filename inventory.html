@@ -456,7 +456,7 @@
                 return;
             }
 
-            const piezas = Number(celdas[0].textContext);
+            const piezas = Number(celdas[0].textContent);
 
             const descripcion = celdas[1].textContent;
 
@@ -511,7 +511,7 @@
             tablaInventario.appendChild(fila);
         }
     }
-    await cargarInventario();
+    cargarInventario();
 
 </script>
 
