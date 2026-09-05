@@ -268,40 +268,173 @@
 
     <!-- JAVASCRIPT -->
 
-    <script>
+<script>
 
-        const btnAgregar =
-            document.getElementById('btnAgregar');
+    const btnAgregar =
+        document.getElementById('btnAgregar');
 
-        const formularioProducto =
-            document.getElementById('formularioProducto');
+    const formularioProducto =
+        document.getElementById('formularioProducto');
 
-        const btnCancelar =
-            document.getElementById('btnCancelar');
+    const btnCancelar =
+        document.getElementById('btnCancelar');
+
+    const btnGuardar =
+        document.getElementById('btnGuardar');
+
+    const tablaInventario =
+        document.getElementById('tablaInventario');
+
+    const piezasInput =
+        document.getElementById('piezas');
+
+    const descripcionInput =
+        document.getElementById('descripcion');
+
+    const precioInput =
+        document.getElementById('precio');
+
+    // MOSTRAR FORMULARIO
+
+    btnAgregar.addEventListener('click', function () {
+
+        formularioProducto.style.display = 'block';
+
+        btnAgregar.style.display = 'none';
+
+        piezasInput.focus();
+
+    });
+
+    // CANCELAR
+
+    btnCancelar.addEventListener('click', function () {
+
+        formularioProducto.style.display = 'none';
+
+        btnAgregar.style.display = 'inline-block';
+
+        limpiarFormulario();
+
+    });
+
+    // GUARDAR PRODUCTO
+
+    btnGuardar.addEventListener('click', function () {
+
+        const piezas = piezasInput.value.trim();
+
+        const descripcion =
+            descripcionInput.value.trim();
+
+        const precio = precioInput.value.trim();
 
 
-        // Mostrar formulario
+        // Validar piezas
 
-        btnAgregar.addEventListener('click', function () {
+        if (piezas === '' || Number(piezas) < 0) {
 
-            formularioProducto.style.display = 'block';
+            alert('Ingresa un número válido de piezas.');
 
-            btnAgregar.style.display = 'none';
+            piezasInput.focus();
 
-        });
+            return;
+        }
 
 
-        // Cancelar
+        // Validar descripción
 
-        btnCancelar.addEventListener('click', function () {
+        if (descripcion === '') {
 
-            formularioProducto.style.display = 'none';
+            alert('Ingresa una descripción.');
 
-            btnAgregar.style.display = 'inline-block';
+            descripcionInput.focus();
 
-        });
+            return;
+        }
 
-    </script>
+
+        // Validar precio
+
+        if (precio === '' || Number(precio) < 0) {
+
+            alert('Ingresa un precio válido.');
+
+            precioInput.focus();
+
+            return;
+        }
+
+
+        // Eliminar mensaje de "No hay productos"
+
+        const mensajeSinProductos =
+            tablaInventario.querySelector('.sin-productos');
+
+        if (mensajeSinProductos) {
+
+            mensajeSinProductos.parentElement.remove();
+
+        }
+
+
+        // Crear nueva fila
+
+        const fila =
+            document.createElement('tr');
+
+
+        fila.innerHTML = `
+
+            <td>${piezas}</td>
+
+            <td>${descripcion}</td>
+
+            <td>$${Number(precio).toFixed(2)}</td>
+
+            <td>
+                <button type="button">
+                    − Descontar
+                </button>
+            </td>
+
+        `;
+
+
+        // Agregar fila a la tabla
+
+        tablaInventario.appendChild(fila);
+
+
+        // Limpiar formulario
+
+        limpiarFormulario();
+
+
+        // Ocultar formulario
+
+        formularioProducto.style.display = 'none';
+
+
+        // Mostrar nuevamente botón agregar
+
+        btnAgregar.style.display = 'inline-block';
+
+    });
+
+    // LIMPIAR FORMULARIO
+
+    function limpiarFormulario() {
+
+        piezasInput.value = '';
+
+        descripcionInput.value = '';
+
+        precioInput.value = '';
+
+    }
+
+</script>
 
 
 </body>
