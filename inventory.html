@@ -1,3 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+
+    <title>Inventario V1.0.3</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f5f7;
+            color: #172b4d;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .inventario-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #dfe1e6;
+            text-align: left;
+            font-size: 12px;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: #f4f5f7;
+        }
+
+        .btn-agregar {
+            border: none;
+            background-color: #0c66e4;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-agregar:hover {
+            background-color: #0055cc;
+        }
+
+        .sin-productos {
+            text-align: center;
+            color: #6b778c;
+            padding: 20px;
+        }
+
+        /* FORMULARIO */
+
+        .formulario-producto {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f4f5f7;
+            border-radius: 8px;
+        }
+
+        .formulario-producto h3 {
+            margin-top: 0;
+        }
+
+        .formulario-producto label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .formulario-producto input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px;
+            border: 1px solid #dfe1e6;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .formulario-botones {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-guardar,
+        .btn-cancelar {
+            border: none;
+            padding: 9px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-guardar {
+            background-color: #0c66e4;
+            color: white;
+        }
+
+        .btn-cancelar {
+            background-color: #dfe1e6;
+            color: #172b4d;
+        }
+
+        /* BOTÓN DESCONTAR */
+
+        .btn-descontar {
+            border: none;
+            background-color: #de350b;
+            color: white;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .btn-descontar:hover {
+            background-color: #bf2600;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="inventario-container">
+
+        <h2>Inventario</h2>
+
+
+        <!-- TABLA DEL INVENTARIO -->
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th style="width:7%;">
+                        Piezas
+                    </th>
+
+                    <th style="width:57%;">
+                        Descripción
+                    </th>
+
+                    <th style="width:16%;">
+                        Precio
+                    </th>
+
+                    <th style="width:20%;">
+                        Acción
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="tablaInventario">
+
+                <tr>
+
+                    <td colspan="4"
+                        class="sin-productos">
+
+                        No hay productos en el inventario.
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+
+        <!-- BOTÓN AGREGAR -->
+
+        <button
+            class="btn-agregar"
+            id="btnAgregar">
+
+            + Agregar producto
+
+        </button>
+
+
+        <!-- FORMULARIO -->
+
+        <div
+            id="formularioProducto"
+            class="formulario-producto">
+
+            <h3>
+                Agregar producto
+            </h3>
+
+
+            <label for="piezas">
+                Número de piezas
+            </label>
+
+            <input
+                type="number"
+                id="piezas"
+                min="0"
+                placeholder="Ej. 25">
+
+
+            <label for="descripcion">
+                Descripción
+            </label>
+
+            <input
+                type="text"
+                id="descripcion"
+                placeholder="Ej. Sensor inductivo M12">
+
+
+            <label for="precio">
+                Precio
+            </label>
+
+            <input
+                type="number"
+                id="precio"
+                min="0"
+                step="0.01"
+                placeholder="Ej. 125.50">
+
+
+            <div class="formulario-botones">
+
+                <button
+                    type="button"
+                    class="btn-guardar"
+                    id="btnGuardar">
+
+                    Guardar
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="btn-cancelar"
+                    id="btnCancelar">
+
+                    Cancelar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- JAVASCRIPT -->
+
 <script>
 
     // ==========================================
@@ -397,3 +686,8 @@
     cargarInventario();
 
 </script>
+
+
+</body>
+
+</html>
