@@ -375,9 +375,7 @@
 
             if (piezas === '' || Number(piezas) < 0) {
 
-                alert(
-                    'Ingresa un número válido de piezas.'
-                );
+                alert('Ingresa un número válido de piezas.');
 
                 piezasInput.focus();
 
@@ -390,10 +388,7 @@
 
             if (descripcion === '') {
 
-                alert(
-                    'Ingresa una descripción.'
-                );
-
+                alert('Ingresa una descripción.');
                 descripcionInput.focus();
 
                 return;
@@ -405,9 +400,7 @@
 
             if (precio === '' || Number(precio) < 0) {
 
-                alert(
-                    'Ingresa un precio válido.'
-                );
+                alert('Ingresa un precio válido.');
 
                 precioInput.focus();
 
@@ -484,14 +477,12 @@
 
             // OCULTAR FORMULARIO
 
-            formularioProducto.style.display =
-                'none';
+            formularioProducto.style.display = 'none';
 
 
             // MOSTRAR BOTÓN AGREGAR
 
-            btnAgregar.style.display =
-                'inline-block';
+            btnAgregar.style.display = 'inline-block';
 
         });
 
@@ -526,9 +517,7 @@
             filas.forEach(function (fila) {
 
                 if (
-                    fila.querySelector(
-                        '.sin-productos'
-                    )
+                    fila.querySelector('.sin-productos')
                 ) {
 
                     return;
@@ -548,9 +537,7 @@
 
 
                 const piezas =
-                    Number(
-                        celdas[0].textContent.trim()
-                    );
+                    Number(celdas[0].textContent.trim());
 
 
                 const descripcion =
@@ -608,8 +595,7 @@
 
 
             if (
-                !productos ||
-                productos.length === 0
+                !productos || productos.length === 0
             ) {
 
                 return;
