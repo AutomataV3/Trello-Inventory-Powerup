@@ -479,6 +479,40 @@
         }
     }
 
+    async function cargarInventario() {
+        
+        const productos = await t.get(
+            'card',
+            'shared',
+            'inventario'
+        );
+
+        if(!productos || productos.length === 0){
+            return;
+        }
+
+        tablaInventario.innerHTML = '';
+
+        productos.forEach(function (producto)){
+
+            const fila = document.createElement('tr');
+
+            fila.innerHTML = `
+                <td>${producto.piezas}</td>
+                <td>${producto.descripcion}</td>
+                <td>${Number(producto.piezas).toFixed(2)}</td>
+                <td>
+                    <button type0"button">
+                        - Descontar
+                    </button>
+                </td>
+            `;
+
+            tablaInventario.appendChild(fila);
+        }
+    }
+    cargarInventario();
+
 </script>
 
 
