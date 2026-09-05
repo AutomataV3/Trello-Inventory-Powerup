@@ -1,431 +1,280 @@
-<!DOCTYPE html>
-<html lang="es">
+<script>
 
-<head>
+    // ==========================================
+    // CONEXIÓN CON TRELLO
+    // ==========================================
 
-    <meta charset="UTF-8">
+    const t = window.TrelloPowerUp.iframe();
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
 
-    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    // ==========================================
+    // ELEMENTOS DE LA INTERFAZ
+    // ==========================================
 
-    <title>Inventario V1.0.3</title>
+    const btnAgregar =
+        document.getElementById('btnAgregar');
 
-    <style>
+    const formularioProducto =
+        document.getElementById('formularioProducto');
 
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f5f7;
-            color: #172b4d;
+    const btnCancelar =
+        document.getElementById('btnCancelar');
+
+    const btnGuardar =
+        document.getElementById('btnGuardar');
+
+    const tablaInventario =
+        document.getElementById('tablaInventario');
+
+    const piezasInput =
+        document.getElementById('piezas');
+
+    const descripcionInput =
+        document.getElementById('descripcion');
+
+    const precioInput =
+        document.getElementById('precio');
+
+
+    // ==========================================
+    // MOSTRAR FORMULARIO
+    // ==========================================
+
+    btnAgregar.addEventListener('click', function () {
+
+        formularioProducto.style.display = 'block';
+
+        btnAgregar.style.display = 'none';
+
+        piezasInput.focus();
+
+    });
+
+
+    // ==========================================
+    // CANCELAR
+    // ==========================================
+
+    btnCancelar.addEventListener('click', function () {
+
+        formularioProducto.style.display = 'none';
+
+        btnAgregar.style.display = 'inline-block';
+
+        limpiarFormulario();
+
+    });
+
+
+    // ==========================================
+    // GUARDAR PRODUCTO
+    // ==========================================
+
+    btnGuardar.addEventListener('click', async function () {
+
+        const piezas =
+            Number(piezasInput.value);
+
+        const descripcion =
+            descripcionInput.value.trim();
+
+        const precio =
+            Number(precioInput.value);
+
+
+        // VALIDAR PIEZAS
+
+        if (
+            piezasInput.value === '' ||
+            piezas < 0
+        ) {
+
+            alert(
+                'Ingresa un número válido de piezas.'
+            );
+
+            piezasInput.focus();
+
+            return;
+
         }
 
-        h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
+
+        // VALIDAR DESCRIPCIÓN
+
+        if (descripcion === '') {
+
+            alert(
+                'Ingresa una descripción.'
+            );
+
+            descripcionInput.focus();
+
+            return;
+
         }
 
-        .inventario-container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 5px;
+
+        // VALIDAR PRECIO
+
+        if (
+            precioInput.value === '' ||
+            precio < 0
+        ) {
+
+            alert(
+                'Ingresa un precio válido.'
+            );
+
+            precioInput.focus();
+
+            return;
+
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
+
+        // ======================================
+        // CREAR OBJETO DEL PRODUCTO
+        // ======================================
+
+        const producto = {
+
+            piezas: piezas,
+
+            descripcion: descripcion,
+
+            precio: precio
+
+        };
+
+
+        try {
+
+            // ==================================
+            // OBTENER INVENTARIO ACTUAL
+            // ==================================
+
+            let productos =
+                await t.get(
+                    'card',
+                    'shared',
+                    'inventario',
+                    []
+                );
+
+
+            if (!Array.isArray(productos)) {
+
+                productos = [];
+
+            }
+
+
+            // ==================================
+            // AGREGAR NUEVO PRODUCTO
+            // ==================================
+
+            productos.push(producto);
+
+
+            // ==================================
+            // GUARDAR INVENTARIO EN TRELLO
+            // ==================================
+
+            await t.set(
+                'card',
+                'shared',
+                'inventario',
+                productos
+            );
+
+
+            // ==================================
+            // ACTUALIZAR TABLA
+            // ==================================
+
+            mostrarInventario(productos);
+
+
+            // ==================================
+            // LIMPIAR FORMULARIO
+            // ==================================
+
+            limpiarFormulario();
+
+
+            formularioProducto.style.display =
+                'none';
+
+
+            btnAgregar.style.display =
+                'inline-block';
+
+
+            // ==================================
+            // NOTIFICACIÓN TEMPORAL
+            // ==================================
+
+            await t.notify({
+                message: 'Producto agregado al inventario.',
+                type: 'success'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al guardar inventario:',
+                error
+            );
+
+
+            alert(
+                'No fue posible guardar el producto en Trello.'
+            );
+
         }
 
-        th,
-        td {
-            padding: 10px;
-            border-bottom: 1px solid #dfe1e6;
-            text-align: left;
-            font-size: 12px;
-        }
-
-        th {
-            font-weight: bold;
-            background-color: #f4f5f7;
-        }
-
-        .btn-agregar {
-            border: none;
-            background-color: #0c66e4;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-agregar:hover {
-            background-color: #0055cc;
-        }
-
-        .sin-productos {
-            text-align: center;
-            color: #6b778c;
-            padding: 20px;
-        }
-
-        /* FORMULARIO */
-
-        .formulario-producto {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f4f5f7;
-            border-radius: 8px;
-        }
-
-        .formulario-producto h3 {
-            margin-top: 0;
-        }
-
-        .formulario-producto label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .formulario-producto input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 9px;
-            border: 1px solid #dfe1e6;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-
-        .formulario-botones {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-guardar,
-        .btn-cancelar {
-            border: none;
-            padding: 9px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .btn-guardar {
-            background-color: #0c66e4;
-            color: white;
-        }
-
-        .btn-cancelar {
-            background-color: #dfe1e6;
-            color: #172b4d;
-        }
-
-        /* BOTÓN DESCONTAR */
-
-        .btn-descontar {
-            border: none;
-            background-color: #de350b;
-            color: white;
-            padding: 6px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .btn-descontar:hover {
-            background-color: #bf2600;
-        }
-
-    </style>
-
-</head>
+    });
 
 
-<body>
+    // ==========================================
+    // MOSTRAR INVENTARIO
+    // ==========================================
 
-    <div class="inventario-container">
+    function mostrarInventario(productos) {
 
-        <h2>Inventario</h2>
+        tablaInventario.innerHTML = '';
 
 
-        <!-- TABLA DEL INVENTARIO -->
+        if (
+            !productos ||
+            productos.length === 0
+        ) {
 
-        <table>
-
-            <thead>
+            tablaInventario.innerHTML = `
 
                 <tr>
 
-                    <th style="width:7%;">
-                        Piezas
-                    </th>
-
-                    <th style="width:57%;">
-                        Descripción
-                    </th>
-
-                    <th style="width:16%;">
-                        Precio
-                    </th>
-
-                    <th style="width:20%;">
-                        Acción
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody id="tablaInventario">
-
-                <tr>
-
-                    <td colspan="4"
+                    <td
+                        colspan="4"
                         class="sin-productos">
 
-                        No hay productos en el inventario.
+                        No hay productos
+                        en el inventario.
 
                     </td>
 
                 </tr>
 
-            </tbody>
+            `;
 
-        </table>
+            return;
 
+        }
 
-        <!-- BOTÓN AGREGAR -->
 
-        <button
-            class="btn-agregar"
-            id="btnAgregar">
-
-            + Agregar producto
-
-        </button>
-
-
-        <!-- FORMULARIO -->
-
-        <div
-            id="formularioProducto"
-            class="formulario-producto">
-
-            <h3>
-                Agregar producto
-            </h3>
-
-
-            <label for="piezas">
-                Número de piezas
-            </label>
-
-            <input
-                type="number"
-                id="piezas"
-                min="0"
-                placeholder="Ej. 25">
-
-
-            <label for="descripcion">
-                Descripción
-            </label>
-
-            <input
-                type="text"
-                id="descripcion"
-                placeholder="Ej. Sensor inductivo M12">
-
-
-            <label for="precio">
-                Precio
-            </label>
-
-            <input
-                type="number"
-                id="precio"
-                min="0"
-                step="0.01"
-                placeholder="Ej. 125.50">
-
-
-            <div class="formulario-botones">
-
-                <button
-                    type="button"
-                    class="btn-guardar"
-                    id="btnGuardar">
-
-                    Guardar
-
-                </button>
-
-
-                <button
-                    type="button"
-                    class="btn-cancelar"
-                    id="btnCancelar">
-
-                    Cancelar
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- JAVASCRIPT -->
-
-    <script>
-
-        // ==========================================
-        // CONEXIÓN CON TRELLO
-        // ==========================================
-
-        const t = TrelloPowerUp.iframe();
-
-
-        // ==========================================
-        // ELEMENTOS DE LA INTERFAZ
-        // ==========================================
-
-        const btnAgregar =
-            document.getElementById('btnAgregar');
-
-        const formularioProducto =
-            document.getElementById('formularioProducto');
-
-        const btnCancelar =
-            document.getElementById('btnCancelar');
-
-        const btnGuardar =
-            document.getElementById('btnGuardar');
-
-        const tablaInventario =
-            document.getElementById('tablaInventario');
-
-        const piezasInput =
-            document.getElementById('piezas');
-
-        const descripcionInput =
-            document.getElementById('descripcion');
-
-        const precioInput =
-            document.getElementById('precio');
-
-
-        // ==========================================
-        // MOSTRAR FORMULARIO
-        // ==========================================
-
-        btnAgregar.addEventListener('click', function () {
-
-            formularioProducto.style.display = 'block';
-
-            btnAgregar.style.display = 'none';
-
-            piezasInput.focus();
-
-        });
-
-
-        // ==========================================
-        // CANCELAR
-        // ==========================================
-
-        btnCancelar.addEventListener('click', function () {
-
-            formularioProducto.style.display = 'none';
-
-            btnAgregar.style.display = 'inline-block';
-
-            limpiarFormulario();
-
-        });
-
-
-        // ==========================================
-        // GUARDAR PRODUCTO
-        // ==========================================
-
-        btnGuardar.addEventListener('click', async function () {
-
-            const piezas =
-                piezasInput.value.trim();
-
-            const descripcion =
-                descripcionInput.value.trim();
-
-            const precio =
-                precioInput.value.trim();
-
-
-            // VALIDAR PIEZAS
-
-            if (piezas === '' || Number(piezas) < 0) {
-
-                alert('Ingresa un número válido de piezas.');
-
-                piezasInput.focus();
-
-                return;
-
-            }
-
-
-            // VALIDAR DESCRIPCIÓN
-
-            if (descripcion === '') {
-
-                alert('Ingresa una descripción.');
-                descripcionInput.focus();
-
-                return;
-
-            }
-
-
-            // VALIDAR PRECIO
-
-            if (precio === '' || Number(precio) < 0) {
-
-                alert('Ingresa un precio válido.');
-
-                precioInput.focus();
-
-                return;
-
-            }
-
-
-            // ELIMINAR MENSAJE "NO HAY PRODUCTOS"
-
-            const mensajeSinProductos =
-                tablaInventario.querySelector(
-                    '.sin-productos'
-                );
-
-            if (mensajeSinProductos) {
-
-                mensajeSinProductos
-                    .parentElement
-                    .remove();
-
-            }
-
-
-            // CREAR FILA
+        productos.forEach(function (producto) {
 
             const fila =
                 document.createElement('tr');
@@ -434,15 +283,15 @@
             fila.innerHTML = `
 
                 <td>
-                    ${piezas}
+                    ${producto.piezas}
                 </td>
 
                 <td>
-                    ${descripcion}
+                    ${producto.descripcion}
                 </td>
 
                 <td>
-                    $${Number(precio).toFixed(2)}
+                    $${Number(producto.precio).toFixed(2)}
                 </td>
 
                 <td>
@@ -460,207 +309,91 @@
             `;
 
 
-            // AGREGAR FILA
-
             tablaInventario.appendChild(fila);
-
-
-            // GUARDAR EN TRELLO
-
-            await guardarInventario();
-
-
-            // LIMPIAR FORMULARIO
-
-            limpiarFormulario();
-
-
-            // OCULTAR FORMULARIO
-
-            formularioProducto.style.display = 'none';
-
-
-            // MOSTRAR BOTÓN AGREGAR
-
-            btnAgregar.style.display = 'inline-block';
 
         });
 
-
-        // ==========================================
-        // LIMPIAR FORMULARIO
-        // ==========================================
-
-        function limpiarFormulario() {
-
-            piezasInput.value = '';
-
-            descripcionInput.value = '';
-
-            precioInput.value = '';
-
-        }
+    }
 
 
-        // ==========================================
-        // GUARDAR INVENTARIO EN TRELLO
-        // ==========================================
+    // ==========================================
+    // CARGAR INVENTARIO DESDE TRELLO
+    // ==========================================
 
-        async function guardarInventario() {
+    async function cargarInventario() {
 
-            const productos = [];
+        try {
 
-            const filas =
-                tablaInventario.querySelectorAll('tr');
+            // Esperamos a que Trello termine
+            // de inicializar el iframe.
 
-
-            filas.forEach(function (fila) {
-
-                if (
-                    fila.querySelector('.sin-productos')
-                ) {
-
-                    return;
-
-                }
+            await t.render();
 
 
-                const celdas =
-                    fila.querySelectorAll('td');
+            // Comprobamos que existe una tarjeta
+            // en el contexto actual.
+
+            const contexto =
+                await t.getContext();
 
 
-                if (celdas.length < 3) {
-
-                    return;
-
-                }
-
-
-                const piezas =
-                    Number(celdas[0].textContent.trim());
-
-
-                const descripcion =
-                    celdas[1].textContent.trim();
-
-
-                const precioTexto =
-                    celdas[2]
-                        .textContent
-                        .replace('$', '')
-                        .trim();
-
-
-                const precio =
-                    Number(precioTexto);
-
-
-                productos.push({
-
-                    piezas: piezas,
-
-                    descripcion: descripcion,
-
-                    precio: precio
-
-                });
-
-            });
-
-
-            // GUARDAR TODO EL INVENTARIO
-
-            await t.set(
-                'card',
-                'shared',
-                'inventario',
-                productos
+            console.log(
+                'Contexto Trello:',
+                contexto
             );
 
-        }
 
-
-        // ==========================================
-        // CARGAR INVENTARIO
-        // ==========================================
-
-        async function cargarInventario() {
+            // Obtener inventario guardado
 
             const productos =
                 await t.get(
                     'card',
                     'shared',
-                    'inventario'
+                    'inventario',
+                    []
                 );
 
 
-            if (
-                !productos || productos.length === 0
-            ) {
-
-                return;
-
-            }
+            console.log(
+                'Inventario recuperado:',
+                productos
+            );
 
 
-            // LIMPIAR TABLA
-
-            tablaInventario.innerHTML = '';
+            mostrarInventario(productos);
 
 
-            // CREAR FILAS
+        } catch (error) {
 
-            productos.forEach(function (producto) {
-
-                const fila =
-                    document.createElement('tr');
-
-
-                fila.innerHTML = `
-
-                    <td>
-                        ${producto.piezas}
-                    </td>
-
-                    <td>
-                        ${producto.descripcion}
-                    </td>
-
-                    <td>
-                        $${Number(producto.precio).toFixed(2)}
-                    </td>
-
-                    <td>
-
-                        <button
-                            type="button"
-                            class="btn-descontar">
-
-                            − Descontar
-
-                        </button>
-
-                    </td>
-
-                `;
-
-
-                tablaInventario.appendChild(fila);
-
-            });
+            console.error(
+                'Error al cargar inventario:',
+                error
+            );
 
         }
 
-
-        // ==========================================
-        // INICIAR INVENTARIO
-        // ==========================================
-
-        cargarInventario();
-
-    </script>
+    }
 
 
-</body>
+    // ==========================================
+    // LIMPIAR FORMULARIO
+    // ==========================================
 
-</html>
+    function limpiarFormulario() {
+
+        piezasInput.value = '';
+
+        descripcionInput.value = '';
+
+        precioInput.value = '';
+
+    }
+
+
+    // ==========================================
+    // INICIAR
+    // ==========================================
+
+    cargarInventario();
+
+</script>
