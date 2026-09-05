@@ -1,32 +1,47 @@
 window.TrelloPowerUp.initialize({
-  'card-buttons': function (t, options) {
 
-    return [
-      {
-        text: 'Inventario',
-        condition: 'always',
-        callback: function (t){
+    'card-buttons': function (t, options) {
 
-          return t.popup({
-            tittle: 'Inventario',
-            url: './inventory.html',
-            height: 300
-          });
-        }
-      }
-    ];
-  },
+        return [
+            {
+                text: 'Inventario',
+                condition: 'always',
 
-  'card-back-section': function (t, options){
+                callback: function (t) {
 
-    return {
-      title: 'Inventario',
-      icon: 'https://automatav3.github.io/Trello-Inventory-Powerup/assets/icon-gray.svg',
-      content: {
-        type: 'iframe',
-        url: './inventory.html',
-        height: 400
-      }
-    };
-  }
+                    return t.popup({
+                        title: 'Inventario',
+                        url: t.signUrl('./inventory.html'),
+                        height: 400
+                    });
+
+                }
+            }
+        ];
+
+    },
+
+
+    'card-back-section': function (t, options) {
+
+        return {
+
+            title: 'Inventario',
+
+            icon: 'https://automatav3.github.io/Trello-Inventory-Powerup/assets/icon-gray.svg',
+
+            content: {
+
+                type: 'iframe',
+
+                url: t.signUrl('./inventory.html'),
+
+                height: 400
+
+            }
+
+        };
+
+    }
+
 });
