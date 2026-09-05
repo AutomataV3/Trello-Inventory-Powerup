@@ -9,8 +9,8 @@
           content="width=device-width, initial-scale=1.0">
 
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
-    
-    <title>Inventario V1.0.2</title>
+
+    <title>Inventario V1.0.3</title>
 
     <style>
 
@@ -127,6 +127,22 @@
             color: #172b4d;
         }
 
+        /* BOTÓN DESCONTAR */
+
+        .btn-descontar {
+            border: none;
+            background-color: #de350b;
+            color: white;
+            padding: 6px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .btn-descontar:hover {
+            background-color: #bf2600;
+        }
+
     </style>
 
 </head>
@@ -147,13 +163,21 @@
 
                 <tr>
 
-                    <th style="width:7%;">Piezas</th>
+                    <th style="width:7%;">
+                        Piezas
+                    </th>
 
-                    <th style="width:57%;">Descripción</th>
+                    <th style="width:57%;">
+                        Descripción
+                    </th>
 
-                    <th style="width:16%;">Precio</th>
+                    <th style="width:16%;">
+                        Precio
+                    </th>
 
-                    <th style="width:20%;">Acción</th>
+                    <th style="width:20%;">
+                        Acción
+                    </th>
 
                 </tr>
 
@@ -195,14 +219,13 @@
             id="formularioProducto"
             class="formulario-producto">
 
-
-            <h3>Agregar producto</h3>
+            <h3>
+                Agregar producto
+            </h3>
 
 
             <label for="piezas">
-
                 Número de piezas
-
             </label>
 
             <input
@@ -213,9 +236,7 @@
 
 
             <label for="descripcion">
-
                 Descripción
-
             </label>
 
             <input
@@ -225,9 +246,7 @@
 
 
             <label for="precio">
-
                 Precio
-
             </label>
 
             <input
@@ -239,7 +258,6 @@
 
 
             <div class="formulario-botones">
-
 
                 <button
                     type="button"
@@ -260,7 +278,6 @@
 
                 </button>
 
-
             </div>
 
         </div>
@@ -270,205 +287,301 @@
 
     <!-- JAVASCRIPT -->
 
-<script>
+    <script>
 
-    const t = TrelloPowerUp.iframe();
-    
-    const btnAgregar =
-        document.getElementById('btnAgregar');
+        // ==========================================
+        // CONEXIÓN CON TRELLO
+        // ==========================================
 
-    const formularioProducto =
-        document.getElementById('formularioProducto');
-
-    const btnCancelar =
-        document.getElementById('btnCancelar');
-
-    const btnGuardar =
-        document.getElementById('btnGuardar');
-
-    const tablaInventario =
-        document.getElementById('tablaInventario');
-
-    const piezasInput =
-        document.getElementById('piezas');
-
-    const descripcionInput =
-        document.getElementById('descripcion');
-
-    const precioInput =
-        document.getElementById('precio');
-
-    // MOSTRAR FORMULARIO
-
-    btnAgregar.addEventListener('click', function () {
-
-        formularioProducto.style.display = 'block';
-
-        btnAgregar.style.display = 'none';
-
-        piezasInput.focus();
-
-    });
-
-    // CANCELAR
-
-    btnCancelar.addEventListener('click', function () {
-
-        formularioProducto.style.display = 'none';
-
-        btnAgregar.style.display = 'inline-block';
-
-        limpiarFormulario();
-
-    });
-
-    // GUARDAR PRODUCTO
-
-    btnGuardar.addEventListener('click', async function () {
-
-        const piezas = piezasInput.value.trim();
-
-        const descripcion =
-            descripcionInput.value.trim();
-
-        const precio = precioInput.value.trim();
+        const t = TrelloPowerUp.iframe();
 
 
-        // Validar piezas
+        // ==========================================
+        // ELEMENTOS DE LA INTERFAZ
+        // ==========================================
 
-        if (piezas === '' || Number(piezas) < 0) {
+        const btnAgregar =
+            document.getElementById('btnAgregar');
 
-            alert('Ingresa un número válido de piezas.');
+        const formularioProducto =
+            document.getElementById('formularioProducto');
+
+        const btnCancelar =
+            document.getElementById('btnCancelar');
+
+        const btnGuardar =
+            document.getElementById('btnGuardar');
+
+        const tablaInventario =
+            document.getElementById('tablaInventario');
+
+        const piezasInput =
+            document.getElementById('piezas');
+
+        const descripcionInput =
+            document.getElementById('descripcion');
+
+        const precioInput =
+            document.getElementById('precio');
+
+
+        // ==========================================
+        // MOSTRAR FORMULARIO
+        // ==========================================
+
+        btnAgregar.addEventListener('click', function () {
+
+            formularioProducto.style.display = 'block';
+
+            btnAgregar.style.display = 'none';
 
             piezasInput.focus();
 
-            return;
-        }
+        });
 
 
-        // Validar descripción
+        // ==========================================
+        // CANCELAR
+        // ==========================================
 
-        if (descripcion === '') {
+        btnCancelar.addEventListener('click', function () {
 
-            alert('Ingresa una descripción.');
+            formularioProducto.style.display = 'none';
 
-            descripcionInput.focus();
+            btnAgregar.style.display = 'inline-block';
 
-            return;
-        }
+            limpiarFormulario();
 
-
-        // Validar precio
-
-        if (precio === '' || Number(precio) < 0) {
-
-            alert('Ingresa un precio válido.');
-
-            precioInput.focus();
-
-            return;
-        }
+        });
 
 
-        // Eliminar mensaje de "No hay productos"
+        // ==========================================
+        // GUARDAR PRODUCTO
+        // ==========================================
 
-        const mensajeSinProductos =
-            tablaInventario.querySelector('.sin-productos');
+        btnGuardar.addEventListener('click', async function () {
 
-        if (mensajeSinProductos) {
+            const piezas =
+                piezasInput.value.trim();
 
-            mensajeSinProductos.parentElement.remove();
+            const descripcion =
+                descripcionInput.value.trim();
 
-        }
-
-
-        // Crear nueva fila
-
-        const fila =
-            document.createElement('tr');
+            const precio =
+                precioInput.value.trim();
 
 
-        fila.innerHTML = `
+            // VALIDAR PIEZAS
 
-            <td>${piezas}</td>
+            if (piezas === '' || Number(piezas) < 0) {
 
-            <td>${descripcion}</td>
+                alert(
+                    'Ingresa un número válido de piezas.'
+                );
 
-            <td>$${Number(precio).toFixed(2)}</td>
+                piezasInput.focus();
 
-            <td>
-                <button type="button">
-                    − Descontar
-                </button>
-            </td>
-
-        `;
-
-
-        // Agregar fila a la tabla
-
-        tablaInventario.appendChild(fila);
-        await guardarInventario();
-
-        // Limpiar formulario
-
-        limpiarFormulario();
-
-
-        // Ocultar formulario
-
-        formularioProducto.style.display = 'none';
-
-
-        // Mostrar nuevamente botón agregar
-
-        btnAgregar.style.display = 'inline-block';
-
-    });
-
-    // LIMPIAR FORMULARIO
-
-    function limpiarFormulario() {
-
-        piezasInput.value = '';
-
-        descripcionInput.value = '';
-
-        precioInput.value = '';
-
-    }
-
-    async function guardarInventario(){
-
-        const productos = [];
-
-        const filas = tablaInventario.querySelectorAll('tr');
-
-        filas.forEach(function (fila)){
-
-            if(fila.querySelector('.sin-productos')){
                 return;
+
             }
 
-            const celdas = fila.querySelectorAll('td');
 
-            if(celdas.length < 3){
+            // VALIDAR DESCRIPCIÓN
+
+            if (descripcion === '') {
+
+                alert(
+                    'Ingresa una descripción.'
+                );
+
+                descripcionInput.focus();
+
                 return;
+
             }
 
-            const piezas = Number(celdas[0].textContent);
 
-            const descripcion = celdas[1].textContent;
+            // VALIDAR PRECIO
 
-            const precioTexto = celdas[2].textContent.replace('$','').trim();
+            if (precio === '' || Number(precio) < 0) {
 
-            const precio = Number(precioTexto);
+                alert(
+                    'Ingresa un precio válido.'
+                );
 
-            productos.push({
-                piezas: piezas,
-                descripcion: descripcion,
-                precio: precio
+                precioInput.focus();
+
+                return;
+
+            }
+
+
+            // ELIMINAR MENSAJE "NO HAY PRODUCTOS"
+
+            const mensajeSinProductos =
+                tablaInventario.querySelector(
+                    '.sin-productos'
+                );
+
+            if (mensajeSinProductos) {
+
+                mensajeSinProductos
+                    .parentElement
+                    .remove();
+
+            }
+
+
+            // CREAR FILA
+
+            const fila =
+                document.createElement('tr');
+
+
+            fila.innerHTML = `
+
+                <td>
+                    ${piezas}
+                </td>
+
+                <td>
+                    ${descripcion}
+                </td>
+
+                <td>
+                    $${Number(precio).toFixed(2)}
+                </td>
+
+                <td>
+
+                    <button
+                        type="button"
+                        class="btn-descontar">
+
+                        − Descontar
+
+                    </button>
+
+                </td>
+
+            `;
+
+
+            // AGREGAR FILA
+
+            tablaInventario.appendChild(fila);
+
+
+            // GUARDAR EN TRELLO
+
+            await guardarInventario();
+
+
+            // LIMPIAR FORMULARIO
+
+            limpiarFormulario();
+
+
+            // OCULTAR FORMULARIO
+
+            formularioProducto.style.display =
+                'none';
+
+
+            // MOSTRAR BOTÓN AGREGAR
+
+            btnAgregar.style.display =
+                'inline-block';
+
+        });
+
+
+        // ==========================================
+        // LIMPIAR FORMULARIO
+        // ==========================================
+
+        function limpiarFormulario() {
+
+            piezasInput.value = '';
+
+            descripcionInput.value = '';
+
+            precioInput.value = '';
+
+        }
+
+
+        // ==========================================
+        // GUARDAR INVENTARIO EN TRELLO
+        // ==========================================
+
+        async function guardarInventario() {
+
+            const productos = [];
+
+            const filas =
+                tablaInventario.querySelectorAll('tr');
+
+
+            filas.forEach(function (fila) {
+
+                if (
+                    fila.querySelector(
+                        '.sin-productos'
+                    )
+                ) {
+
+                    return;
+
+                }
+
+
+                const celdas =
+                    fila.querySelectorAll('td');
+
+
+                if (celdas.length < 3) {
+
+                    return;
+
+                }
+
+
+                const piezas =
+                    Number(
+                        celdas[0].textContent.trim()
+                    );
+
+
+                const descripcion =
+                    celdas[1].textContent.trim();
+
+
+                const precioTexto =
+                    celdas[2]
+                        .textContent
+                        .replace('$', '')
+                        .trim();
+
+
+                const precio =
+                    Number(precioTexto);
+
+
+                productos.push({
+
+                    piezas: piezas,
+
+                    descripcion: descripcion,
+
+                    precio: precio
+
+                });
+
             });
+
+
+            // GUARDAR TODO EL INVENTARIO
 
             await t.set(
                 'card',
@@ -476,44 +589,90 @@
                 'inventario',
                 productos
             );
-        }
-    }
 
-    async function cargarInventario() {
-        
-        const productos = await t.get(
-            'card',
-            'shared',
-            'inventario'
-        );
-
-        if(!productos || productos.length === 0){
-            return;
         }
 
-        tablaInventario.innerHTML = '';
 
-        productos.forEach(function (producto)){
+        // ==========================================
+        // CARGAR INVENTARIO
+        // ==========================================
 
-            const fila = document.createElement('tr');
+        async function cargarInventario() {
 
-            fila.innerHTML = `
-                <td>${producto.piezas}</td>
-                <td>${producto.descripcion}</td>
-                <td>${Number(producto.piezas).toFixed(2)}</td>
-                <td>
-                    <button type0"button">
-                        - Descontar
-                    </button>
-                </td>
-            `;
+            const productos =
+                await t.get(
+                    'card',
+                    'shared',
+                    'inventario'
+                );
 
-            tablaInventario.appendChild(fila);
+
+            if (
+                !productos ||
+                productos.length === 0
+            ) {
+
+                return;
+
+            }
+
+
+            // LIMPIAR TABLA
+
+            tablaInventario.innerHTML = '';
+
+
+            // CREAR FILAS
+
+            productos.forEach(function (producto) {
+
+                const fila =
+                    document.createElement('tr');
+
+
+                fila.innerHTML = `
+
+                    <td>
+                        ${producto.piezas}
+                    </td>
+
+                    <td>
+                        ${producto.descripcion}
+                    </td>
+
+                    <td>
+                        $${Number(producto.precio).toFixed(2)}
+                    </td>
+
+                    <td>
+
+                        <button
+                            type="button"
+                            class="btn-descontar">
+
+                            − Descontar
+
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                tablaInventario.appendChild(fila);
+
+            });
+
         }
-    }
-    cargarInventario();
 
-</script>
+
+        // ==========================================
+        // INICIAR INVENTARIO
+        // ==========================================
+
+        cargarInventario();
+
+    </script>
 
 
 </body>
