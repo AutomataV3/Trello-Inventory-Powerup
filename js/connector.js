@@ -44,4 +44,8 @@ window.TrelloPowerUp.initialize({
 
     }
 
+},
+{
+    appKey: '3c3623e5d8a1a7c61958039752f2c9c1',
+    appName: 'Inventory Maneger'
 });
