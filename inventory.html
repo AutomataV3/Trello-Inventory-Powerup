@@ -622,7 +622,6 @@
             const api = await t.getRestApi();
 
             const token = await api.getToken();
-            console.log(`TOKEN OBTENIDO:`, token);
             
             const comentario =
                 `🔴 Stock agotado\n\n` +
@@ -630,19 +629,23 @@
                 `Descuento realizado: ${cantidadDescontada} piezas\n` +
                 `Stock restante: ${producto.piezas} piezas`;
 
-            const respuesta = await fetch(`https://api.trello.com/1/cards/${cardId}/actions/comments`+
+            const respuesta = await fetch(`https://api.trello.com/1/cards/${cardId}`+
                                          `?key=${encodeURIComponent('3c3623e5d8a1a7c61958039752f2c9c1')}`+
                                          `&token=${encodeURIComponent(token)}`+
                                          `&text=${encodeURIComponent(comentario)}`,
-                                          {method: 'POST'}
+                                          {method: 'GET'}
                                          );
+            console.log('RESPUESTA FETCH:', respuesta.status);
+            
             if(!respuesta.ok){
                 throw new Error(`Trello respondió con HTTP ${respuesta.status}`);
             }
+
+            const tarjeta = await respuesta.json();
             
-                console.log('Comentario de stock agotado creado correctamente.');
+            console.log('TARJETA OBTENIDA', tarjeta);
             } catch (error) {
-                console.error('No fue posible crear el comentario de stock agotado:', error);
+                console.error('ERROR EN PRUEBA DE CONEXIÓN:', error);
             }
     }
 
