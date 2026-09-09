@@ -631,8 +631,7 @@
 
             const respuesta = await fetch(`https://api.trello.com/1/cards/${cardId}`+
                                          `?key=${encodeURIComponent('3c3623e5d8a1a7c61958039752f2c9c1')}`+
-                                         `&token=${encodeURIComponent(token)}`+
-                                         `&text=${encodeURIComponent(comentario)}`,
+                                         `&token=${encodeURIComponent(token)}`,
                                           {method: 'GET'}
                                          );
             console.log('RESPUESTA FETCH:', respuesta.status);
