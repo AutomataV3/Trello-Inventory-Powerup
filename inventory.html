@@ -621,11 +621,7 @@
     });
 
     async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
-        try {
-            const api = await t.getRestApi();
-            console.log('API REST:', api);
-            console.log('MÉTODOS:', Object.keys(api));
-            const token = await api.getToken();
+        return new Promise((resolve, reject) => {
             
             const comentario =
                 `🔴 Stock agotado\n\n` +
@@ -633,23 +629,23 @@
                 `Descuento realizado: ${cantidadDescontada} piezas\n` +
                 `Stock restante: ${producto.piezas} piezas`;
 
-            const respuesta = await fetch(`https://api.trello.com/1/cards/${cardId}`+
-                                         `?key=${encodeURIComponent('3c3623e5d8a1a7c61958039752f2c9c1')}`+
-                                         `&token=${encodeURIComponent(token)}`,
-                                          {method: 'GET'}
-                                         );
-            console.log('RESPUESTA FETCH:', respuesta.status);
-            
-            if(!respuesta.ok){
-                throw new Error(`Trello respondió con HTTP ${respuesta.status}`);
-            }
+            console.log('Intentando crear comentario...');
+            console.log('Card ID:', cardId);
+            console.log('Comentario:', comentario);
 
-            const tarjeta = await respuesta.json();
-            
-            console.log('TARJETA OBTENIDA', tarjeta);
-            } catch (error) {
-                console.error('ERROR EN PRUEBA DE CONEXIÓN:', error);
-            }
+            Trello.post(
+                `cards/${cardId}/actions/comments`,
+                {text: comentario},
+                function (respuesta){
+                    console.log('COMENTARIO CREADO CORRECTAMENTE:', respuesta);
+                    resolve(respuesta);
+                },
+                function (error){
+                    console.error('ERROR AL CREAR COMENTARIO:', error);
+                    reject(error);
+                }
+            );
+        }):
     }
 
 
