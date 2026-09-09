@@ -580,6 +580,42 @@
                 productos
             );
 
+            async function agregarComentarioStockAgotado(
+    cardId,
+    producto,
+    cantidadDescontada
+) {
+    try {
+
+        const api = await t.getRestApi();
+
+        const comentario =
+            `🔴 Stock agotado\n\n` +
+            `Producto: ${producto.descripcion}\n` +
+            `Descuento realizado: ${cantidadDescontada} piezas\n` +
+            `Stock restante: ${producto.piezas} piezas`;
+
+        await api.post(
+            `/cards/${cardId}/actions/comments`,
+            {
+                text: comentario
+            }
+        );
+
+        console.log(
+            'Comentario de stock agotado creado correctamente.'
+        );
+
+    } catch (error) {
+
+        console.error(
+            'No fue posible crear el comentario de stock agotado:',
+            error
+        );
+
+    }
+}
+
 
             // ==================================
             // ACTUALIZAR TABLA
