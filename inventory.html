@@ -618,20 +618,27 @@
     });
 
     async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
-            try {
+        try {
             const api = await t.getRestApi();
 
+            const token = api.getToken();
+            
             const comentario =
                 `🔴 Stock agotado\n\n` +
                 `Producto: ${producto.descripcion}\n` +
                 `Descuento realizado: ${cantidadDescontada} piezas\n` +
                 `Stock restante: ${producto.piezas} piezas`;
 
-            await api.post(
-            `/cards/${cardId}/actions/comments`,
-            {
-                text: comentario
-            });
+            const respuesta = await fetch(`https://api.trello.com/1/cards/${cardId}/actions/comments`+
+                                         `?key=${encodeURIComponent('3c3623e5d8a1a7c61958039752f2c9c1')}`+
+                                         `&token=${encodeURIComponent(token)}`+
+                                         `&text=${encodeURIComponent(comentario)}`,
+                                          {method: 'POST'}
+                                         );
+            if(!respuesta.ok){
+                throw new Error(`Trello respondió con HTTP ${respuesta.status}`);
+            }
+            
                 console.log('Comentario de stock agotado creado correctamente.');
             } catch (error) {
                 console.error('No fue posible crear el comentario de stock agotado:', error);
