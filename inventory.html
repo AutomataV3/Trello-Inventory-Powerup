@@ -620,7 +620,8 @@
     async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
         try {
             const api = await t.getRestApi();
-
+            console.log('API REST:', api);
+            console.log('MÉTODOS:', Object.keys(api));
             const token = await api.getToken();
             
             const comentario =
