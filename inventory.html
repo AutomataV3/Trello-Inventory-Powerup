@@ -622,6 +622,7 @@
             const api = await t.getRestApi();
 
             const token = await api.getToken();
+            console.log(`TOKEN OBTENIDO:`, token);
             
             const comentario =
                 `🔴 Stock agotado\n\n` +
