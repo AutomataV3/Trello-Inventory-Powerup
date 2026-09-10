@@ -621,50 +621,55 @@
     });
 
     async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    console.log('Probando Trello.rest()...');
 
+                    const comentario =
+                        `🔴 Stock agotado\n\n` +
+                        `Producto: ${producto.descripcion}\n` +
+                        `Descuento realizado: ${cantidadDescontada} piezas\n` +
+                        `Stock restante: ${producto.piezas} piezas`;
 
-        try {
+                    console.log('Card ID:', cardId);
+                    console.log('Comentario:', comentario);
 
-            console.log('Obteniendo cliente REST de Trello...');
+                    Trello.rest(
+                        'POST',
+                        `cards/${cardId}/actions/comments`,
+                        {
+                            text: comentario
+                        },
+                        function (respuesta) {
 
-            const api = await t.getRestApi();
+                            console.log(
+                                'COMENTARIO CREADO CORRECTAMENTE:',
+                                respuesta
+                            );
 
-            console.log('Cliente REST obtenido:', api);
+                            resolve(respuesta);
 
-            const token = await api.getToken();
+                        },
+                        function (error) {
 
-            console.log('¿Token obtenido?:', !!token);
-            console.log('Longitud del token:', token ? token.length : 0);
+                            console.error(
+                                'ERROR EN Trello.rest():',
+                                error
+                            );
 
-            if (!token) {
-                throw new Error('No se obtuvo un token de Trello.');
-            }    
-
-            console.log('Probando token contra Trello...');
-
-            const url =
-                `https://api.trello.com/1/members/me` +
-                `?key=${encodeURIComponent('3c3623e5d8a1a7c61958039752f2c9c1')}` +
-                `&token=${encodeURIComponent(token)}`;
-
-            const respuesta = await fetch(url, {
-                method: 'GET'
-            });
-
-            console.log('HTTP:', respuesta.status);
-
-            const texto = await respuesta.text();
-
-            console.log('RESPUESTA TRELLO:', texto);
-
-        } catch (error) {
-
-            console.error(
-                'ERROR PROBANDO TOKEN:',
-                error
+                            reject(error);
+                        }
             );
 
-        }
+                } catch (error) {
+                    console.error(
+                    'ERROR EJECUTANDO Trello.rest():',
+                    error
+                    );
+
+                reject(error);
+                }
+            });
     }
 
     // ==========================================
