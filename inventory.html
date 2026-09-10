@@ -621,57 +621,91 @@
     });
 
     async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    console.log('Probando Trello.rest()...');
+        try {
 
-                    const comentario =
-                        `🔴 Stock agotado\n\n` +
-                        `Producto: ${producto.descripcion}\n` +
-                        `Descuento realizado: ${cantidadDescontada} piezas\n` +
-                        `Stock restante: ${producto.piezas} piezas`;
+            console.log('Obteniendo token del Power-Up...');
 
-                    console.log('Card ID:', cardId);
-                    console.log('Comentario:', comentario);
+            const api = await t.getRestApi();
 
-                    Trello.rest(
-                        'POST',
-                        `cards/${cardId}/actions/comments`,
-                        {
-                            text: comentario
-                        },
-                        function (respuesta) {
+            const token = await api.getToken();
 
-                            console.log(
-                                'COMENTARIO CREADO CORRECTAMENTE:',
-                                respuesta
-                            );
+            if (!token) {
+                throw new Error(
+                    'No se obtuvo el token de Trello.'
+                );
+            }
 
-                            resolve(respuesta);
-
-                        },
-                        function (error) {
-
-                            console.error(
-                                'ERROR EN Trello.rest():',
-                                error
-                            );
-
-                            reject(error);
-                        }
+            console.log(
+                'Token obtenido correctamente.'
             );
 
-                } catch (error) {
-                    console.error(
-                    'ERROR EJECUTANDO Trello.rest():',
-                    error
+        // ==========================================
+        // PASAR EL TOKEN A CLIENT.JS
+        // ==========================================
+
+            Trello.setToken(token);
+
+            console.log(
+                'Token asignado a client.js.'
+            );
+
+        // ==========================================
+        // CREAR COMENTARIO
+        // ==========================================
+
+            const comentario =
+                `🔴 Stock agotado\n\n` +
+                `Producto: ${producto.descripcion}\n` +
+                `Descuento realizado: ${cantidadDescontada} piezas\n` +
+                `Stock restante: ${producto.piezas} piezas`;
+
+            console.log(
+                'Intentando crear comentario...'
+            );
+
+            console.log(
+                'Card ID:',
+                cardId
+            );
+
+            console.log(
+                'Comentario:',
+                comentario
+            );
+
+            Trello.post(
+                `cards/${cardId}/actions/comments`,
+                {
+                    text: comentario
+                },
+                function (respuesta) {
+
+                    console.log(
+                        'COMENTARIO CREADO CORRECTAMENTE:',
+                        respuesta
                     );
 
-                reject(error);
-                }
-            });
-    }
+                },
+                function (error) {
 
+                    console.error(
+                        'ERROR AL CREAR COMENTARIO:',
+                        error
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                'ERROR OBTENIENDO/AUTORIZANDO TOKEN:',
+                error
+            );
+
+            throw error;
+        }
+    }
     // ==========================================
     // MOSTRAR INVENTARIO
     // ==========================================
