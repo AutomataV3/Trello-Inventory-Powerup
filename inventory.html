@@ -623,7 +623,7 @@
     async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
         return new Promise((resolve, reject) => {
             
-            const comentario =
+       /*     const comentario =
                 `🔴 Stock agotado\n\n` +
                 `Producto: ${producto.descripcion}\n` +
                 `Descuento realizado: ${cantidadDescontada} piezas\n` +
@@ -644,7 +644,23 @@
                     console.error('ERROR AL CREAR COMENTARIO:', error);
                     reject(error);
                 }
-            );
+            ); */
+            
+        console.log('Probando conexión con la API de Trello...');
+
+        Trello.get(
+            'members/me',
+            {},
+            function (respuesta) {
+                console.log('CONEXIÓN CON TRELLO EXITOSA');
+                console.log('Usuario:', respuesta);
+                resolve(respuesta);
+            },
+            function (error) {
+                console.error('ERROR DE CONEXIÓN CON TRELLO:', error);
+                reject(error);
+            }
+        );
         });
     }
 
