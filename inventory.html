@@ -620,92 +620,172 @@
 
     });
 
-    async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
-        try {
+async function agregarComentarioStockAgotado(
+    cardId,
+    producto,
+    cantidadDescontada
+) {
 
-            console.log('Obteniendo token del Power-Up...');
+    try {
 
-            const api = await t.getRestApi();
+        console.log('=================================');
+        console.log('CREAR COMENTARIO DE STOCK AGOTADO');
+        console.log('=================================');
 
-            const token = await api.getToken();
+        console.log('Card ID:', cardId);
 
-            if (!token) {
-                throw new Error(
-                    'No se obtuvo el token de Trello.'
-                );
-            }
+        const comentario =
+            `🔴 Stock agotado\n\n` +
+            `Producto: ${producto.descripcion}\n` +
+            `Descuento realizado: ${cantidadDescontada} piezas\n` +
+            `Stock restante: ${producto.piezas} piezas`;
 
-            console.log(
-                'Token obtenido correctamente.'
-            );
-
-        // ==========================================
-        // PASAR EL TOKEN A CLIENT.JS
-        // ==========================================
-
-            Trello.setToken(token);
-
-            console.log(
-                'Token asignado a client.js.'
-            );
+        console.log(
+            'Comentario:',
+            comentario
+        );
 
         // ==========================================
-        // CREAR COMENTARIO
+        // OBTENER CLIENTE REST DE TRELLO
         // ==========================================
 
-            const comentario =
-                `🔴 Stock agotado\n\n` +
-                `Producto: ${producto.descripcion}\n` +
-                `Descuento realizado: ${cantidadDescontada} piezas\n` +
-                `Stock restante: ${producto.piezas} piezas`;
+        const api = await t.getRestApi();
 
-            console.log(
-                'Intentando crear comentario...'
+        console.log(
+            'Cliente REST obtenido:',
+            api
+        );
+
+        // ==========================================
+        // COMPROBAR AUTORIZACIÓN
+        // ==========================================
+
+        const autorizado =
+            await api.isAuthorized();
+
+        console.log(
+            '¿Power-Up autorizado?:',
+            autorizado
+        );
+
+        if (!autorizado) {
+
+            throw new Error(
+                'El usuario no ha autorizado el Power-Up para realizar operaciones REST.'
             );
 
-            console.log(
-                'Card ID:',
-                cardId
+        }
+
+        // ==========================================
+        // OBTENER TOKEN
+        // ==========================================
+
+        const token =
+            await api.getToken();
+
+        console.log(
+            'Token obtenido correctamente:',
+            !!token
+        );
+
+        if (!token) {
+
+            throw new Error(
+                'Trello no proporcionó un token.'
             );
 
-            console.log(
-                'Comentario:',
-                comentario
-            );
+        }
 
-            Trello.post(
-                `cards/${cardId}/actions/comments`,
+        // ==========================================
+        // HACER POST DIRECTAMENTE A TRELLO
+        // ==========================================
+
+        const url =
+            `https://api.trello.com/1/cards/${cardId}/actions/comments` +
+            `?key=${encodeURIComponent(
+                '3c3623e5d8a1a7c61958039752f2c9c1'
+            )}` +
+            `&token=${encodeURIComponent(token)}`;
+
+        console.log(
+            'Enviando POST a Trello...'
+        );
+
+        const respuesta =
+            await fetch(
+                url,
                 {
-                    text: comentario
-                },
-                function (respuesta) {
+                    method: 'POST',
 
-                    console.log(
-                        'COMENTARIO CREADO CORRECTAMENTE:',
-                        respuesta
-                    );
+                    headers: {
+                        'Content-Type':
+                            'application/x-www-form-urlencoded'
+                    },
 
-                },
-                function (error) {
-
-                    console.error(
-                        'ERROR AL CREAR COMENTARIO:',
-                        error
-                    );
-
+                    body:
+                        `text=${encodeURIComponent(
+                            comentario
+                        )}`
                 }
             );
 
-        } catch (error) {
+        console.log(
+            'HTTP status:',
+            respuesta.status
+        );
 
-            console.error(
-                'ERROR OBTENIENDO/AUTORIZANDO TOKEN:',
-                error
+        const texto =
+            await respuesta.text();
+
+        console.log(
+            'Respuesta de Trello:',
+            texto
+        );
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                `Trello respondió HTTP ${respuesta.status}: ${texto}`
             );
 
-            throw error;
         }
+
+        console.log(
+            '================================='
+        );
+
+        console.log(
+            'COMENTARIO CREADO CORRECTAMENTE'
+        );
+
+        console.log(
+            '================================='
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            '================================='
+        );
+
+        console.error(
+            'ERROR AL CREAR COMENTARIO'
+        );
+
+        console.error(
+            error
+        );
+
+        console.error(
+            '================================='
+        );
+
+        throw error;
+
     }
+}
     // ==========================================
     // MOSTRAR INVENTARIO
     // ==========================================
