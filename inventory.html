@@ -634,224 +634,25 @@ async function agregarComentarioStockAgotado(
     producto,
     cantidadDescontada
 ) {
-
-    try {
-
-        console.log('=================================');
-        console.log('PRUEBA DE CREACIÓN DE COMENTARIO');
-        console.log('=================================');
-
-        const api = await t.getRestApi();
-
-        const autorizado =
-            await api.isAuthorized();
-
-        console.log(
-            'Power-Up autorizado:',
-            autorizado
-        );
-
-        if (!autorizado) {
-
-            throw new Error(
-                'El Power-Up no está autorizado.'
-            );
-
-        }
-
-        const token =
-            await api.getToken();
-
-        console.log(
-            'Token disponible:',
-            !!token
-        );
-
-        if (!token) {
-
-            throw new Error(
-                'No existe token de Trello.'
-            );
-
-        }
-
-        // Pasamos el token al cliente REST de client.js
-        Trello.setToken(token);
-
-        console.log(
-            'Token configurado en client.js.'
-        );
-
-        const comentario =
-            `🔴 Stock agotado\n\n` +
-            `Producto: ${producto.descripcion}\n` +
-            `Descuento realizado: ${cantidadDescontada} piezas\n` +
-            `Stock restante: ${producto.piezas} piezas`;
-
-        console.log(
-            'Card ID:',
-            cardId
-        );
-
-        console.log(
-            'Enviando comentario mediante Trello.post()...'
-        );
-
-        return new Promise(
-            function (resolve, reject) {
-
-                Trello.post(
-                    `cards/${cardId}/actions/comments`,
-                    {
-                        text: comentario
-                    },
-
-                    function (respuesta) {
-
-                        console.log(
-                            '================================='
-                        );
-
-                        console.log(
-                            'COMENTARIO CREADO'
-                        );
-
-                        console.log(
-                            respuesta
-                        );
-
-                        console.log(
-                            '================================='
-                        );
-
-                        resolve(respuesta);
-
-                    },
-
-                    function (error) {
-
-                        console.error(
-                            '================================='
-                        );
-
-                        console.error(
-                            'ERROR EN Trello.post()'
-                        );
-
-                        console.error(
-                            error
-                        );
-
-                        console.error(
-                            '================================='
-                        );
-
-                        reject(error);
-
-                    }
-                );
-
-            }
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            'ERROR GENERAL AL CREAR COMENTARIO:',
-            error
-        );
-
-        throw error;
-
-    }
-
+    
 }
 
-    async function probarConexionTrello() {
-
-    try {
-
-        console.log(
-            '================================='
-        );
-
-        console.log(
-            'PRUEBA GET A TRELLO'
-        );
-
-        console.log(
-            '================================='
-        );
-
-        const api =
-            await t.getRestApi();
-
-        const token =
-            await api.getToken();
-
-        Trello.setToken(token);
-
-        console.log(
-            'Ejecutando Trello.get("members/me")...'
-        );
-
-        Trello.get(
-            'members/me',
-
-            {},
-
-            function (respuesta) {
-
-                console.log(
-                    '================================='
-                );
-
-                console.log(
-                    'GET EXITOSO'
-                );
-
-                console.log(
-                    respuesta
-                );
-
-                console.log(
-                    '================================='
-                );
-
-            },
-
-            function (error) {
-
-                console.error(
-                    '================================='
-                );
-
-                console.error(
-                    'GET FALLÓ'
-                );
-
-                console.error(
-                    error
-                );
-
-                console.error(
-                    '================================='
-                );
-
-            }
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            'ERROR EN PRUEBA:',
-            error
-        );
-
-    }
-
+function probarConexionTrello() {
+    const mensaje = `Este no es un comentario`;
+    return t.card('id').then(card => {
+        const cardId = card.id;
+        return t.get('member', 'private', 'authToken').then(token => {
+            const key = 3c3623e5d8a1a7c61958039752f2c9c1;
+            const url = `https://api.trello.com/1/cards/${cardId}/actions/comments?key=${key}&token=${token}&text=${encodeURIComponent(mensaje)}`;
+            return fetch (url, {
+                method: 'POST',
+            }).then(response => response.json())
+                .then(data => {
+                console.log('Comentaio agregado:', data);
+            })
+                .catch(err => console.error('Error al agregar comentario:', err));
+        });
+    });
 }
     
     // ==========================================
