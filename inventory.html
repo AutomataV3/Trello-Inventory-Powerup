@@ -642,7 +642,7 @@ function probarConexionTrello() {
     return t.card('id').then(card => {
         const cardId = card.id;
         return t.get('member', 'private', 'authToken').then(token => {
-            const key = 3c3623e5d8a1a7c61958039752f2c9c1;
+            const key = `3c3623e5d8a1a7c61958039752f2c9c1`;
             const url = `https://api.trello.com/1/cards/${cardId}/actions/comments?key=${key}&token=${token}&text=${encodeURIComponent(mensaje)}`;
             return fetch (url, {
                 method: 'POST',
