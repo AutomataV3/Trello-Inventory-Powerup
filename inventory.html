@@ -630,15 +630,7 @@
     });
 
 
-async function agregarComentarioStockAgotado(
-    cardId,
-    producto,
-    cantidadDescontada
-) {
-
-    console.log('=================================');
-    console.log('CREANDO COMENTARIO DE STOCK AGOTADO');
-    console.log('=================================');
+async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontada) {
 
     const comentario =
         `🔴 Stock agotado\n\n` +
@@ -646,195 +638,41 @@ async function agregarComentarioStockAgotado(
         `Descuento realizado: ${cantidadDescontada} piezas\n` +
         `Stock restante: ${producto.piezas} piezas`;
 
-    console.log('Card ID:', cardId);
-    console.log('Comentario:', comentario);
-
     try {
 
-        // ==========================================
-        // OBTENER CLIENTE REST DE TRELLO
-        // ==========================================
-
-        const api =
-            await t.getRestApi();
-
-        console.log(
-            'Cliente REST obtenido correctamente.'
-        );
-
-
-        // ==========================================
-        // VERIFICAR AUTORIZACIÓN
-        // ==========================================
-
-        const autorizado =
-            await api.isAuthorized();
-
-        console.log(
-            '¿Power-Up autorizado?:',
-            autorizado
-        );
-
-        if (!autorizado) {
-
-            throw new Error(
-                'El Power-Up no está autorizado para utilizar la API de Trello.'
-            );
-
-        }
-
-
-        // ==========================================
-        // OBTENER TOKEN
-        // ==========================================
-
-        const token =
-            await api.getToken();
-
-        console.log(
-            'Token obtenido correctamente:',
-            !!token
-        );
+        // Igual que en probarConexionTrello(): se lee el token
+        // directamente del almacenamiento privado del miembro,
+        // en vez de usar t.getRestApi().getToken(), que puede
+        // fallar en Chrome por el Third Party Storage Partitioning.
+        const token = await t.get('member', 'private', 'authToken');
 
         if (!token) {
-
-            throw new Error(
-                'No se pudo obtener el token de Trello.'
-            );
-
+            throw new Error('No hay token de Trello disponible. Autoriza el Power-Up primero.');
         }
 
-
-        // ==========================================
-        // API KEY DEL POWER-UP
-        // ==========================================
-
-        const apiKey =
-            '3c3623e5d8a1a7c61958039752f2c9c1';
-
-
-        // ==========================================
-        // CONSTRUIR URL
-        // ==========================================
+        const apiKey = '3c3623e5d8a1a7c61958039752f2c9c1';
 
         const url =
             'https://api.trello.com/1/cards/' +
             encodeURIComponent(cardId) +
             '/actions/comments' +
-            '?text=' +
-            encodeURIComponent(comentario) +
-            '&key=' +
-            encodeURIComponent(apiKey) +
-            '&token=' +
-            encodeURIComponent(token);
+            '?key=' + encodeURIComponent(apiKey) +
+            '&token=' + encodeURIComponent(token) +
+            '&text=' + encodeURIComponent(comentario);
 
-
-        console.log(
-            'Enviando POST a Trello...'
-        );
-
-        console.log(
-            'Endpoint:',
-            '/1/cards/{id}/actions/comments'
-        );
-
-
-        // ==========================================
-        // CREAR COMENTARIO
-        // ==========================================
-
-        const response =
-            await fetch(
-                url,
-                {
-                    method: 'POST',
-
-                    headers: {
-                        'Accept':
-                            'application/json'
-                    }
-                }
-            );
-
-
-        // ==========================================
-        // MOSTRAR RESPUESTA HTTP
-        // ==========================================
-
-        console.log(
-            'HTTP:',
-            response.status,
-            response.statusText
-        );
-
-
-        // ==========================================
-        // COMPROBAR ERROR HTTP
-        // ==========================================
+        const response = await fetch(url, { method: 'POST' });
 
         if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            throw new Error(
-                `Trello respondió HTTP ${response.status}: ${errorText}`
-            );
-
+            const errorText = await response.text();
+            throw new Error(`Trello respondió HTTP ${response.status}: ${errorText}`);
         }
 
-
-        // ==========================================
-        // LEER RESPUESTA
-        // ==========================================
-
-        const resultado =
-            await response.json();
-
-
-        console.log(
-            '================================='
-        );
-
-        console.log(
-            'COMENTARIO CREADO CORRECTAMENTE'
-        );
-
-        console.log(
-            'ID DEL COMENTARIO:',
-            resultado.id
-        );
-
-        console.log(
-            'RESPUESTA DE TRELLO:',
-            resultado
-        );
-
-        console.log(
-            '================================='
-        );
-
-
+        const resultado = await response.json();
+        console.log('Comentario creado correctamente:', resultado);
         return resultado;
 
     } catch (error) {
-
-        console.error(
-            '================================='
-        );
-
-        console.error(
-            'ERROR AL CREAR COMENTARIO'
-        );
-
-        console.error(
-            error
-        );
-
-        console.error(
-            '================================='
-        );
-
+        console.error('Error al crear comentario de stock agotado:', error);
         throw error;
     }
 }
@@ -847,7 +685,7 @@ function probarConexionTrello() {
         const cardId = card.id;
         return t.get('member', 'private', 'authToken').then(token => {
             const key = `3c3623e5d8a1a7c61958039752f2c9c1`;
-            const url = `https://api.trello.com/1/cards/${cardId}/actions/comments?key=${key}&token=${token}&text=${encodeURIComponent(mensaje)}`;
+            const url = `https://api.trello.com/1/cards/${cardId}/actions/comments?text=${encodeURIComponent(mensaje)&key=${key}&token=${token}}`;
             return fetch (url, {
                 method: 'POST',
             }).then(response => response.json())
