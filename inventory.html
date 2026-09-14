@@ -656,9 +656,9 @@ async function agregarComentarioStockAgotado(cardId, producto, cantidadDescontad
             'https://api.trello.com/1/cards/' +
             encodeURIComponent(cardId) +
             '/actions/comments' +
+            '&text=' + encodeURIComponent(comentario) +
             '?key=' + encodeURIComponent(apiKey) +
-            '&token=' + encodeURIComponent(token) +
-            '&text=' + encodeURIComponent(comentario);
+            '&token=' + encodeURIComponent(token);
 
         const response = await fetch(url, { method: 'POST' });
 
